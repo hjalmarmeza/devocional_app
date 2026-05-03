@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MusiChris Studio | Devocional Control Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #FFD700;
+            --glass: rgba(255, 255, 255, 0.1);
+            --bg: #0a0a0c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* Fondo animado sutil */
+        .ambient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% -20%, #1a1a2e, #0a0a0c);
+            z-index: -1;
+        }
+
+        header {
+            padding: 40px 20px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .logo-container img {
+            width: 120px;
+            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 1.2rem;
+            color: var(--gold);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 450px;
+            margin-bottom: 100px;
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .video-preview {
+            width: 100%;
+            aspect-ratio: 9/16;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 20px;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .info-group {
+            margin-bottom: 20px;
+        }
+
+        .info-group label {
+            display: block;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .info-group p {
+            font-size: 0.95rem;
+            color: #fff;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 18px;
+            border-radius: 15px;
+            border: none;
+            background: linear-gradient(135deg, var(--gold), #b8860b);
+            color: #000;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .footer-nav {
+            position: fixed;
+            bottom: 20px;
+            width: 90%;
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            padding: 15px;
+            border-radius: 20px;
+            display: flex;
+            justify-content: space-around;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            color: rgba(255, 255, 255, 0.4);
+            text-decoration: none;
+            font-size: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .nav-item.active {
+            color: var(--gold);
+        }
+
+        .dot {
+            width: 4px;
+            height: 4px;
+            background: var(--gold);
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-bg"></div>
+
+    <header>
+        <div class="logo-container">
+            <img src="assets/fondos/05.png" alt="Logo" style="width: 60px; height: 60px; object-fit: cover; border-radius: 50%; border: 2px solid var(--gold);">
+        </div>
+        <h1>MusiChris Studio</h1>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <div class="status-badge">Producción Activa</div>
+            
+            <div class="video-preview">
+                <!-- Se cargará el último video generado -->
+                <video controls poster="plantilla_base.png">
+                    <source src="shorts/2026-05-04_short.mp4" type="video/mp4">
+                    Tu navegador no soporta video.
+                </video>
+            </div>
+
+            <div class="info-group">
+                <label>Último Render</label>
+                <p id="video-date">04 de mayo, 2026</p>
+            </div>
+
+            <div class="info-group">
+                <label>Estado de YouTube</label>
+                <p>Pendiente de Tokens</p>
+            </div>
+
+            <a href="https://github.com/hjalmarmeza/devocional_app/actions" class="btn-primary">
+                <span>🚀 Lanzar Workflow</span>
+            </a>
+        </div>
+    </div>
+
+    <nav class="footer-nav">
+        <a href="#" class="nav-item active">
+            <span>Inicio</span>
+            <div class="dot"></div>
+        </a>
+        <a href="#" class="nav-item">
+            <span>Archivo</span>
+        </a>
+        <a href="#" class="nav-item">
+            <span>Ajustes</span>
+        </a>
+    </nav>
+
+    <script>
+        // Lógica para detectar el último video o actualizar la fecha automáticamente
+        const date = new Date();
+        document.getElementById('video-date').innerText = date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+    </script>
+</body>
+</html>
