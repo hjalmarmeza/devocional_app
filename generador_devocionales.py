@@ -3,21 +3,26 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 import textwrap
 
-# --- CONFIGURACIÓN DE ÁREA (REPOSITORIO DE CRISTAL) ---
-# Basado en la imagen de 1024x1024
-RECT_X1, RECT_Y1 = 180, 340
-RECT_X2, RECT_Y2 = 844, 705
-RECT_WIDTH = RECT_X2 - RECT_X1
-RECT_HEIGHT = RECT_Y2 - RECT_Y1
-CENTER_X = 512
-CENTER_Y = RECT_Y1 + (RECT_HEIGHT / 2)
+# --- CONFIGURACIÓN ESTRATÉGICA POR MES (CALIBRACIÓN AL MILÍMETRO) ---
+# Formato: "mes": (x1, y1, x2, y2)
+CALIBRACION = {
+    "default": (180, 340, 844, 705),
+    "05": (180, 340, 844, 705), # Mayo
+    "06": (180, 340, 844, 705), # Junio
+    "07": (240, 395, 750, 635), # Julio (Ajustado al cristal de la Lira)
+    "08": (220, 255, 770, 500), # Agosto (Shofar - cristal más arriba)
+    "09": (180, 320, 825, 680), # Septiembre (Biblia)
+    "10": (175, 400, 825, 600), # Octubre (Altar - cristal horizontal central)
+    "11": (280, 335, 860, 695), # Noviembre (Trigo)
+    "12": (180, 280, 820, 675), # Diciembre (Pesebre)
+}
 
 # --- CONFIGURACIÓN DE RUTAS ---
 ASSETS_DIR = "Devocional/assets/fondos"
 JSON_PATH = "Devocional/devocionales_2026.json"
 OUTPUT_DIR = "Devocional/publicaciones"
 FONT_PATH = "Devocional/assets/fonts/base_font.ttf"
-DEFAULT_BG = "05.png" # Mayo como backup
+DEFAULT_BG = "05.png"
 
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
@@ -49,19 +54,24 @@ def generar_imagenes_premium():
             
         print(f"🎨 Usando fondo: {bg_path} para {item['fecha']}")
 
+        # Obtener calibración para el mes
+        x1, y1, x2, y2 = CALIBRACION.get(mes, CALIBRACION["default"])
+        rect_width = x2 - x1
+        rect_height = y2 - y1
+        center_y = y1 + (rect_height / 2)
+
         # --- PANTALLA 1: VERSÍCULO ---
         img1 = Image.open(bg_path).convert("RGBA")
         draw1 = ImageDraw.Draw(img1)
         
-        font_ref = ImageFont.truetype(FONT_PATH, 45)  # Referencia (Salmo...)
-        font_body = ImageFont.truetype(FONT_PATH, 32) # Texto bíblico
+        font_ref = ImageFont.truetype(FONT_PATH, 45)
+        font_body = ImageFont.truetype(FONT_PATH, 32)
         
-        # Calcular altura total para centrar verticalmente en el cristal
         ref_lines = textwrap.wrap(item['versiculo'], width=25)
         body_lines = textwrap.wrap(f"\"{item['texto']}\"", width=40)
         
         total_h = get_text_height(draw1, ref_lines, font_ref, 15) + get_text_height(draw1, body_lines, font_body, 12) + 20
-        y_cursor = CENTER_Y - (total_h / 2)
+        y_cursor = center_y - (total_h / 2)
 
         # Dibujar Referencia en Dorado Suave
         y_cursor = draw_styled_text(draw1, item['versiculo'], font_ref, (218, 165, 32), y_cursor, 25)
@@ -80,7 +90,7 @@ def generar_imagenes_premium():
 
         ref_body_lines = textwrap.wrap(item['reflexion'], width=45)
         total_h2 = get_text_height(draw2, [item['titulo']], font_title, 20) + get_text_height(draw2, ref_body_lines, font_reflect, 10) + 20
-        y_cursor2 = CENTER_Y - (total_h2 / 2)
+        y_cursor2 = center_y - (total_h2 / 2)
 
         # Dibujar Título
         y_cursor2 = draw_styled_text(draw2, item['titulo'], font_title, (218, 165, 32), y_cursor2, 30)
