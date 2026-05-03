@@ -113,7 +113,10 @@ if __name__ == "__main__":
     global FONT_PATH
     FONT_PATH = "assets/fonts/base_font.ttf"
     
+    today = datetime.now().strftime("%Y-%m-%d")
+    
     with open(JSON_PATH, 'r') as f:
         data = json.load(f)
         for item in data:
-            render_short(item['fecha'])
+            if item['fecha'] == today:
+                render_short(item['fecha'])

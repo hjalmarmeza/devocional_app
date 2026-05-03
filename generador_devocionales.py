@@ -44,7 +44,18 @@ def generar_imagenes_premium():
     with open(JSON_PATH, 'r', encoding='utf-8') as f:
         devocionales = json.load(f)
 
-    for item in devocionales:
+    import datetime
+    today = datetime.date.today().strftime("%Y-%m-%d")
+    
+    # Filtrar solo para hoy
+    hoy_data = [d for d in devocionales if d['fecha'] == today]
+    
+    if not hoy_data:
+        print(f"⚠️ No hay devocional programado para hoy ({today})")
+        return
+
+    for item in hoy_data:
+        # ... (resto del código igual)
         # Determinar el mes para el fondo (formato MM.png)
         mes = item['fecha'].split("-")[1]
         bg_path = os.path.join(ASSETS_DIR, f"{mes}.png")
