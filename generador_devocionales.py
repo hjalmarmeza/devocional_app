@@ -18,10 +18,10 @@ CALIBRACION = {
 }
 
 # --- CONFIGURACIÓN DE RUTAS ---
-ASSETS_DIR = "Devocional/assets/fondos"
-JSON_PATH = "Devocional/devocionales_2026.json"
-OUTPUT_DIR = "Devocional/publicaciones"
-FONT_PATH = "Devocional/assets/fonts/base_font.ttf"
+ASSETS_DIR = "assets/fondos"
+JSON_PATH = "devocionales_2026.json"
+OUTPUT_DIR = "publicaciones"
+FONT_PATH = "assets/fonts/base_font.ttf"
 DEFAULT_BG = "05.png"
 
 if not os.path.exists(OUTPUT_DIR):

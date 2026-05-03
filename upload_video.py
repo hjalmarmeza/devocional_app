@@ -65,7 +65,7 @@ def upload_to_youtube(video_path, title, description, tags):
 if __name__ == "__main__":
     # Ejemplo de uso para el devocional de hoy
     today = datetime.date.today().strftime("%Y-%m-%d")
-    path = f"Devocional/shorts/{today}_short.mp4"
+    path = f"shorts/{today}_short.mp4"
     
     if os.path.exists(path):
         upload_to_youtube(

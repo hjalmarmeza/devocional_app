@@ -4,11 +4,11 @@ import json
 from datetime import datetime
 
 # --- CONFIGURACIÓN ---
-JSON_PATH = "Devocional/devocionales_2026.json"
-IMGS_DIR = "Devocional/publicaciones"
-MUSIC_DIR = "Devocional/musica mp3"
-ASSETS_DIR = "Devocional/assets/fondos"
-OUTPUT_DIR = "Devocional/shorts"
+JSON_PATH = "devocionales_2026.json"
+IMGS_DIR = "publicaciones"
+MUSIC_DIR = "musica mp3"
+ASSETS_DIR = "assets/fondos"
+OUTPUT_DIR = "shorts"
 
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
@@ -111,7 +111,7 @@ def render_short(fecha):
 if __name__ == "__main__":
     # Asegurar que FONT_PATH esté disponible para drawtext
     global FONT_PATH
-    FONT_PATH = "Devocional/assets/fonts/base_font.ttf"
+    FONT_PATH = "assets/fonts/base_font.ttf"
     
     with open(JSON_PATH, 'r') as f:
         data = json.load(f)
