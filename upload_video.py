@@ -8,26 +8,27 @@ import json
 def upload_to_youtube(video_path, title, description, tags):
     print(f"🚀 Iniciando motor de subida ministerial para: {video_path}")
     
-    # Cargar credenciales desde variables de entorno (GitHub Secrets)
+    # Cargar credenciales y token
     creds_json = os.environ.get('YOUTUBE_CREDENTIALS')
     token_json = os.environ.get('YOUTUBE_TOKEN')
     
     if not creds_json or not token_json:
-        print("❌ Error: Faltan secretos YOUTUBE_CREDENTIALS o YOUTUBE_TOKEN.")
+        print("❌ Faltan secretos de YouTube")
         return
 
-    # Parsear JSONs
     creds_data = json.loads(creds_json)
     token_data = json.loads(token_json)
     
-    # Manejar si el token es solo el refresh_token
-    if isinstance(token_data, str):
-        token_data = {
-            "refresh_token": token_data,
-            "client_id": creds_data['installed']['client_id'],
-            "client_secret": creds_data['installed']['client_secret'],
-            "token_uri": "https://oauth2.googleapis.com/token"
-        }
+    # Extraer client_id y client_secret de las credenciales
+    client_info = creds_data.get('installed') or creds_data.get('web') or creds_data
+    
+    # Asegurar que el token tenga lo necesario
+    if 'client_id' not in token_data:
+        token_data['client_id'] = client_info.get('client_id')
+    if 'client_secret' not in token_data:
+        token_data['client_secret'] = client_info.get('client_secret')
+    if 'token_uri' not in token_data:
+        token_data['token_uri'] = "https://oauth2.googleapis.com/token"
 
     credentials = Credentials.from_authorized_user_info(token_data)
     youtube = build('youtube', 'v3', credentials=credentials)
