@@ -2,8 +2,11 @@ name: Devocional App Automation
 
 on:
   schedule:
-    - cron: '0 5 * * *' # Corre todos los días a las 5:00 AM UTC
-  workflow_dispatch: # Permite ejecución manual desde la consola
+    - cron: '0 5 * * *' # Corre todos los días a las 5:00 AM UTC (7 AM España)
+  workflow_dispatch: 
+
+permissions:
+  contents: write
 
 jobs:
   build:
