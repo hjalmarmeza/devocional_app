@@ -27,22 +27,22 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
     - name: Generate Images
-      run: python Devocional/generador_devocionales.py
+      run: python generador_devocionales.py
 
     - name: Render Video Short
-      run: python Devocional/render_video.py
+      run: python render_video.py
 
     - name: Upload to YouTube
       env:
         YOUTUBE_CREDENTIALS: ${{ secrets.YOUTUBE_CREDENTIALS }}
         YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
-      run: python Devocional/upload_video.py
+      run: python upload_video.py
 
     - name: Commit and Push changes
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add Devocional/publicaciones/*.png
-        git add Devocional/shorts/*.mp4
+        git add publicaciones/*.png
+        git add shorts/*.mp4
         git commit -m "Auto-generado devocional del día $(date +%F)" || echo "No hay cambios para subir"
         git push
