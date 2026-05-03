@@ -220,7 +220,10 @@
         "titulo": "Descanso en Su Paz",
         "versiculo": "Salmo 4:8",
         "texto": "En paz me acostaré, y asimismo dormiré.",
-        "reflexion": "Cerramos el mes en paz profunda. El Autor de tu     {
+        "reflexion": "Cerramos el mes en paz profunda. El Autor de tu historia conoce cada nota de tu vida y promete que Su descanso cubrirá toda angustia. Duerme confiando en Sus brazos.",
+        "publicado": false
+    },
+    {
         "fecha": "2026-06-01",
         "titulo": "Cántico Nuevo",
         "versiculo": "Salmo 40:3",
@@ -448,7 +451,11 @@
         "fecha": "2026-06-29",
         "titulo": "Pueblo que Canta",
         "versiculo": "Salmo 149:1",
-        "texto": "Cantad a Jehová cántico     {
+        "texto": "Cantad a Jehová cántico nuevo; su alabanza sea en la congregación de los santos.",
+        "reflexion": "No estás solo en tu adoración. Eres parte de un pueblo que ha decidido cantar juntos. Únete hoy al coro de los redimidos y que tu voz se sume al gran concierto de fe.",
+        "publicado": false
+    },
+    {
         "fecha": "2026-06-30",
         "titulo": "Final Maestoso",
         "versiculo": "Apocalipsis 5:13",
