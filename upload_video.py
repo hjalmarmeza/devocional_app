@@ -76,8 +76,8 @@ if __name__ == "__main__":
             data = json.load(f)
             for item in data:
                 if item['fecha'] == today:
-                    title_yt = f"{item['titulo']} | Devocional Diario #Shorts"
-                    desc_yt = f"🔥 {item['titulo']}\n\n{item['reflexion'][:150]}...\n\nVersículo: {item['versiculo']}\n\nSuscríbete para caminar juntos en fe: @Musichris_Studio\n\n#Shorts #Dios #Fe #Victoria #MusiChris #Cristiano"
+                    title_yt = f"{item['titulo']} | Musichris Studio #Shorts"
+                    desc_yt = f"🔥 {item['titulo']}\n\n{item['reflexion'][:200]}...\n\n📖 Versículo: {item['versiculo']}\n\n✨ Únete a nuestra comunidad en Musichris Studio: @Musichris_Studio\n\n#Shorts #Dios #Fe #Victoria #MusichrisStudio #Cristiano"
                     break
 
     if os.path.exists(path):
@@ -85,7 +85,7 @@ if __name__ == "__main__":
             video_path=path,
             title=title_yt,
             description=desc_yt,
-            tags=["Devocional", "MusiChris", "Fe", "Dios", "Victoria", "Cristiano"]
+            tags=["Musichris Studio", "Devocional", "Fe", "Dios", "Victoria", "Cristiano", "Palabra de Vida"]
         )
     else:
         print(f"⚠️ Archivo no encontrado: {path}")
