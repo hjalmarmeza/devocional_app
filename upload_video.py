@@ -40,7 +40,7 @@ def upload_to_youtube(video_path, title, description, tags):
             'categoryId': '22' # People & Blogs
         },
         'status': {
-            'privacyStatus': 'public', # Publicación directa a las 7:00 AM España
+            'privacyStatus': 'unlisted',
             'selfDeclaredMadeForKids': False
         }
     }
