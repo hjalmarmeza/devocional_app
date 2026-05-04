@@ -78,8 +78,8 @@ def generar_imagenes_premium():
         font_ref = ImageFont.truetype(FONT_PATH, 55)
         font_body = ImageFont.truetype(FONT_PATH, 44)
         
-        ref_lines = textwrap.wrap(item['versiculo'], width=22)
-        body_lines = textwrap.wrap(f"\"{item['texto']}\"", width=32)
+        ref_lines = textwrap.wrap(item['versiculo'], width=20)
+        body_lines = textwrap.wrap(f"\"{item['texto']}\"", width=24)
         
         total_h = get_text_height(draw1, ref_lines, font_ref, 15) + get_text_height(draw1, body_lines, font_body, 12) + 20
         y_cursor = center_y - (total_h / 2)
