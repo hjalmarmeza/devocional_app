@@ -1,6 +1,6 @@
 {
-  "name": "MusiChris Studio",
-  "short_name": "MusiChris",
+  "name": "MusiChris Devocional",
+  "short_name": "Devocional",
   "description": "Centro de Monitoreo Ministerial - Devocionales Diarios",
   "start_url": "index.html",
   "display": "standalone",
