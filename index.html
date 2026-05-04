@@ -189,7 +189,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #0a0a0c;
+            background: radial-gradient(circle at center, #1a1a2e, #0a0a0c);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -198,33 +198,61 @@
             transition: opacity 1s ease-out, visibility 1s;
         }
 
+        .splash-logo-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .splash-logo-bg {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: breathe 3s infinite ease-in-out;
+        }
+
         .splash-logo {
-            width: 150px;
-            height: 150px;
-            border-radius: 30px;
-            box-shadow: 0 0 50px rgba(255, 215, 0, 0.2);
-            animation: pulse 2s infinite ease-in-out;
-            margin-bottom: 25px;
+            width: 180px;
+            height: 180px;
+            border-radius: 40px;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: entry 1.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .splash-text {
-            font-size: 1.4rem;
-            letter-spacing: 4px;
+            font-size: 1.1rem;
+            letter-spacing: 6px;
             color: var(--gold);
             text-transform: uppercase;
-            font-weight: 300;
+            font-weight: 400;
             opacity: 0;
-            animation: fadeInText 1s forwards 0.5s;
+            text-align: center;
+            background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInText 1.5s forwards 0.8s;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); filter: brightness(1); }
-            50% { transform: scale(1.05); filter: brightness(1.2); }
-            100% { transform: scale(1); filter: brightness(1); }
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        @keyframes entry {
+            from { transform: scale(0.8) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
         }
 
         @keyframes fadeInText {
-            to { opacity: 1; transform: translateY(-10px); }
+            from { opacity: 0; letter-spacing: 2px; transform: translateY(10px); }
+            to { opacity: 1; letter-spacing: 6px; transform: translateY(0); }
         }
 
         /* Mobile Adjustments */
@@ -246,7 +274,10 @@
 <body>
     <!-- Pantalla de Inicio -->
     <div id="splash-screen">
-        <img src="assets/logo.png" alt="MusiChris Logo" class="splash-logo">
+        <div class="splash-logo-container">
+            <div class="splash-logo-bg"></div>
+            <img src="assets/logo.png" alt="MusiChris Logo" class="splash-logo">
+        </div>
         <div class="splash-text">MusiChris Devocional</div>
     </div>
 
