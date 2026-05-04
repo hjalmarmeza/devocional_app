@@ -62,31 +62,58 @@ def upload_to_youtube(video_path, title, description, tags):
 
     print(f"✅ ¡GLORIA A DIOS! Video subido. ID: {response['id']}")
     print(f"🔗 URL: https://youtu.be/{response['id']}")
+    return response['id']
+
+def save_status(fecha, video_id):
+    json_path = "devocionales_2026.json"
+    if os.path.exists(json_path):
+        with open(json_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        for item in data:
+            if item['fecha'] == fecha:
+                item['publicado'] = True
+                item['youtube_id'] = video_id
+                break
+        
+        with open(json_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
+        print(f"💾 Estado actualizado en JSON para {fecha}")
 
 if __name__ == "__main__":
     today = datetime.date.today().strftime("%Y-%m-%d")
     path = f"shorts/{today}_short.mp4"
     json_path = "devocionales_2026.json"
     
-    # Intentar obtener datos dinámicos del JSON
+    # Cargar datos y verificar si ya se publicó
     title_yt = f"Palabra de Vida - {today} #Shorts"
     desc_yt = "🌬️ Recibe esta palabra de bendición hoy. #Shorts #Fe #Dios"
+    already_published = False
     
     if os.path.exists(json_path):
         with open(json_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
             for item in data:
                 if item['fecha'] == today:
+                    if item.get('publicado'):
+                        already_published = True
+                        print(f"✅ El devocional de hoy ({today}) ya consta como publicado.")
+                        break
                     title_yt = f"{item['titulo']} | MusiChris Devocional #Shorts"
                     desc_yt = f"🔥 {item['titulo']}\n\n{item['reflexion'][:200]}...\n\n📖 Versículo: {item['versiculo']}\n\n✨ MusiChris Devocional: Tu dosis diaria de paz y adoración.\n\n#Shorts #Dios #Fe #Victoria #MusiChrisDevocional #Cristiano"
                     break
 
+    if already_published:
+        exit(0)
+
     if os.path.exists(path):
-        upload_to_youtube(
+        video_id = upload_to_youtube(
             video_path=path,
             title=title_yt,
             description=desc_yt,
             tags=["MusiChris Devocional", "Fe", "Dios", "Victoria", "Cristiano", "Palabra de Vida"]
         )
+        if video_id:
+            save_status(today, video_id)
     else:
         print(f"⚠️ Archivo no encontrado: {path}")
