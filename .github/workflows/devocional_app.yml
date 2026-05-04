@@ -3,7 +3,12 @@ name: Devocional App Automation
 on:
   schedule:
     - cron: '0 5 * * *' # Corre todos los días a las 5:00 AM UTC (7 AM España)
-  workflow_dispatch: 
+  workflow_dispatch:
+    inputs:
+      privacy_status:
+        description: 'Privacidad del video (public, unlisted, private)'
+        required: true
+        default: 'unlisted'
 
 permissions:
   contents: write
@@ -39,6 +44,7 @@ jobs:
       env:
         YOUTUBE_CREDENTIALS: ${{ secrets.YOUTUBE_CREDENTIALS }}
         YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
+        YOUTUBE_PRIVACY: ${{ github.event.inputs.privacy_status || 'public' }}
       run: python upload_video.py
 
     - name: Commit and Push changes
