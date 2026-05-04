@@ -85,10 +85,10 @@ def generar_imagenes_premium():
         y_cursor = center_y - (total_h / 2)
 
         # Dibujar Referencia en Dorado Suave
-        y_cursor = draw_styled_text(draw1, item['versiculo'], font_ref, (218, 165, 32), y_cursor, 25)
+        y_cursor = draw_styled_text(draw1, item['versiculo'], font_ref, (218, 165, 32), y_cursor, 20)
         y_cursor += 10
         # Dibujar Texto en Blanco
-        draw_styled_text(draw1, f"\"{item['texto']}\"", font_body, (255, 255, 255), y_cursor, 40)
+        draw_styled_text(draw1, f"\"{item['texto']}\"", font_body, (255, 255, 255), y_cursor, 24)
 
         img1.save(f"{OUTPUT_DIR}/{item['fecha']}_P1.png")
 
@@ -104,10 +104,10 @@ def generar_imagenes_premium():
         y_cursor2 = center_y - (total_h2 / 2)
 
         # Dibujar Título
-        y_cursor2 = draw_styled_text(draw2, item['titulo'], font_title, (218, 165, 32), y_cursor2, 28)
+        y_cursor2 = draw_styled_text(draw2, item['titulo'], font_title, (218, 165, 32), y_cursor2, 22)
         y_cursor2 += 20
         # Dibujar Reflexión
-        draw_styled_text(draw2, item['reflexion'], font_reflect, (255, 255, 255), y_cursor2, 35)
+        draw_styled_text(draw2, item['reflexion'], font_reflect, (255, 255, 255), y_cursor2, 30)
 
         img2.save(f"{OUTPUT_DIR}/{item['fecha']}_P2.png")
         
