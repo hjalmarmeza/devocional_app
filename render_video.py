@@ -49,24 +49,33 @@ def render_short(fecha):
     is_video = selected_bg.endswith(".mp4")
     print(f"🌍 Fondo seleccionado: {selected_bg}")
         
-    # Crear Outro Transparente Dinámico
+    # Crear Outro Transparente Dinámico (Limpieza total)
     outro_overlay = os.path.join(IMGS_DIR, f"{fecha}_OUTRO_OVERLAY.png")
-    img_outro = Image.new("RGBA", (1024, 1024), (0, 0, 0, 0))
+    img_outro = Image.new("RGBA", (1080, 1920), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img_outro)
+    
     # Rectángulo de cristal para el cierre
-    draw.rounded_rectangle([200, 400, 824, 624], radius=30, fill=(0, 0, 0, 180))
-    try: font = ImageFont.truetype(FONT_PATH, 50)
-    except: font = ImageFont.load_default()
-    txt = "Suscríbete y camina en fe"
-    bbox = draw.textbbox((0,0), txt, font=font)
-    draw.text(((1024-(bbox[2]-bbox[0]))/2, 480), txt, font=font, fill="white")
+    draw.rounded_rectangle([150, 700, 930, 1100], radius=50, fill=(0, 0, 0, 180), outline=(218, 165, 32, 100), width=4)
+    
+    try: font_outro = ImageFont.truetype(FONT_PATH, 60)
+    except: font_outro = ImageFont.load_default()
+    
+    txt1 = "SUSCRÍBETE"
+    txt2 = "Para más bendición"
+    
+    b1 = draw.textbbox((0,0), txt1, font=font_outro)
+    draw.text(((1080-(b1[2]-b1[0]))/2, 800), txt1, font=font_outro, fill=(218, 165, 32, 255))
+    
+    b2 = draw.textbbox((0,0), txt2, font=font_outro)
+    draw.text(((1080-(b2[2]-b2[0]))/2, 920), txt2, font=font_outro, fill="white")
+    
     img_outro.save(outro_overlay)
         
     logo_animado = os.path.join(ASSETS_DIR, "logo animado/Logo Hjalmar Animado.mp4")
     music = get_music_file(month_num)
     
     if not os.path.exists(p1) or not os.path.exists(p2) or not music:
-        print(f"❌ Faltan archivos para {fecha} (P1, P2 o Música)")
+        print(f"❌ Faltan archivos para {fecha} (P1: {os.path.exists(p1)}, P2: {os.path.exists(p2)}, Música: {os.path.exists(music)})")
         return
 
     output_video = os.path.join(OUTPUT_DIR, f"{fecha}_short.mp4")
@@ -74,17 +83,17 @@ def render_short(fecha):
     # Configurar entrada de fondo
     input_bg_args = ["-stream_loop", "-1", "-i", selected_bg] if is_video else ["-loop", "1", "-i", selected_bg]
     
-    # Filtro Cinematográfico Pro
+    # Filtro Cinematográfico Pro (Capas nativas 1080x1920)
     filter_complex = (
         f"[0:v]scale=1080*1.5:-1,zoompan=z='zoom+0.0002':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1080x1920:fps=30,setsar=1[bg];"
         f"[1:v]format=rgba,fade=t=in:st=0:d=1:alpha=1,fade=t=out:st=10:d=1:alpha=1[c1];"
         f"[2:v]format=rgba,fade=t=in:st=11:d=1:alpha=1,fade=t=out:st=21:d=1:alpha=1[c2];"
         f"[3:v]format=rgba,fade=t=in:st=22:d=1:alpha=1,fade=t=out:st=27:d=1:alpha=1[c3];"
-        f"[4:v]colorkey=black:0.1:0.1,scale=800:-1,fade=t=in:st=22:d=1:alpha=1[logo];"
-        f"[bg][c1]overlay=(W-w)/2:(H-h)/2[v1];"
-        f"[v1][c2]overlay=(W-w)/2:(H-h)/2[v2];"
-        f"[v2][c3]overlay=(W-w)/2:(H-h)/2[v3];"
-        f"[v3][logo]overlay=(W-w)/2:(H-h)/2-150[v]"
+        f"[4:v]colorkey=black:0.1:0.1,scale=600:-1,fade=t=in:st=22:d=1:alpha=1[logo];"
+        f"[bg][c1]overlay=0:0[v1];"
+        f"[v1][c2]overlay=0:0[v2];"
+        f"[v2][c3]overlay=0:0[v3];"
+        f"[v3][logo]overlay=(W-w)/2:350[v]"
     )
 
     cmd = ["ffmpeg", "-y"] + input_bg_args + [

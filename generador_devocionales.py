@@ -46,8 +46,6 @@ def generar_imagenes_premium():
 
     import datetime
     today = datetime.date.today().strftime("%Y-%m-%d")
-    
-    # Filtrar solo para hoy
     hoy_data = [d for d in devocionales if d['fecha'] == today]
     
     if not hoy_data:
@@ -55,62 +53,81 @@ def generar_imagenes_premium():
         return
 
     for item in hoy_data:
-        mes = item['fecha'].split("-")[1]
+        # --- CONFIGURACIÓN DE LIENZO VERTICAL (1080x1920) ---
+        W, H = 1080, 1920
         
-        # Obtener calibración para el mes (mantener consistencia visual)
-        x1, y1, x2, y2 = CALIBRACION.get(mes, CALIBRACION["default"])
-        rect_width = x2 - x1
-        rect_height = y2 - y1
-        center_y = y1 + (rect_height / 2)
+        for i in range(1, 3): # Pantalla 1 (Versículo) y Pantalla 2 (Reflexión)
+            img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+            draw = ImageDraw.Draw(img)
+            
+            # 1. DIBUJAR TÍTULO EN 2 LÍNEAS (Parte Superior)
+            try:
+                font_title_main = ImageFont.truetype(FONT_PATH, 100)
+                font_title_sub = ImageFont.truetype(FONT_PATH, 80)
+            except:
+                font_title_main = font_title_sub = ImageFont.load_default()
+            
+            # "DEVOCIONAL"
+            t1 = "DEVOCIONAL"
+            bbox1 = draw.textbbox((0, 0), t1, font=font_title_main)
+            draw.text(((W - (bbox1[2]-bbox1[0]))/2, 150), t1, font=font_title_main, fill=(255, 255, 255, 255), stroke_width=2, stroke_fill="black")
+            
+            # "DIARIO"
+            t2 = "DIARIO"
+            bbox2 = draw.textbbox((0, 0), t2, font=font_title_sub)
+            draw.text(((W - (bbox2[2]-bbox2[0]))/2, 260), t2, font=font_title_sub, fill=(218, 165, 32, 255), stroke_width=1, stroke_fill="black")
 
-        # --- PANTALLA 1: VERSÍCULO (Capa Transparente) ---
-        img1 = Image.new("RGBA", (1024, 1024), (0, 0, 0, 0)) # Formato cuadrado para el centro
-        draw1 = ImageDraw.Draw(img1)
-        
-        # Dibujar un panel de cristal oscuro semi-transparente
-        # x1, y1, x2, y2 ya están definidos por la calibración
-        draw1.rounded_rectangle([x1-20, y1-20, x2+20, y2+20], radius=40, fill=(0, 0, 0, 160))
-        
-        font_ref = ImageFont.truetype(FONT_PATH, 55)
-        font_body = ImageFont.truetype(FONT_PATH, 44)
-        
-        ref_lines = textwrap.wrap(item['versiculo'], width=20)
-        body_lines = textwrap.wrap(f"\"{item['texto']}\"", width=24)
-        
-        total_h = get_text_height(draw1, ref_lines, font_ref, 15) + get_text_height(draw1, body_lines, font_body, 12) + 20
-        y_cursor = center_y - (total_h / 2)
+            # 2. MARCO DE CRISTAL CENTRAL
+            # Definimos un marco elegante en el centro
+            m_x1, m_y1, m_x2, m_y2 = 100, 500, 980, 1400
+            draw.rounded_rectangle([m_x1, m_y1, m_x2, m_y2], radius=50, fill=(0, 0, 0, 160), outline=(255, 255, 255, 50), width=3)
+            
+            # 3. CONTENIDO DINÁMICO
+            center_panel_y = (m_y1 + m_y2) / 2
+            
+            if i == 1: # P1: Versículo
+                f_ref = ImageFont.truetype(FONT_PATH, 65)
+                f_text = ImageFont.truetype(FONT_PATH, 50)
+                
+                # Referencia
+                ref_txt = item['versiculo']
+                lines_ref = textwrap.wrap(ref_txt, width=25)
+                y_cursor = m_y1 + 80
+                for line in lines_ref:
+                    bw = draw.textbbox((0,0), line, font=f_ref)
+                    draw.text(((W - (bw[2]-bw[0]))/2, y_cursor), line, font=f_ref, fill=(218, 165, 32, 255))
+                    y_cursor += 80
+                
+                y_cursor += 40
+                # Texto del versículo
+                body_txt = f"\"{item['texto']}\""
+                lines_body = textwrap.wrap(body_txt, width=30)
+                for line in lines_body:
+                    bw = draw.textbbox((0,0), line, font=f_text)
+                    draw.text(((W - (bw[2]-bw[0]))/2, y_cursor), line, font=f_text, fill="white")
+                    y_cursor += 65
+                    
+            else: # P2: Reflexión
+                f_title = ImageFont.truetype(FONT_PATH, 70)
+                f_refl = ImageFont.truetype(FONT_PATH, 45)
+                
+                # Título de la reflexión
+                refl_title = item['titulo']
+                bw = draw.textbbox((0,0), refl_title, font=f_title)
+                draw.text(((W - (bw[2]-bw[0]))/2, m_y1 + 80), refl_title, font=f_title, fill=(218, 165, 32, 255))
+                
+                # Cuerpo de la reflexión
+                y_cursor = m_y1 + 200
+                refl_txt = item['reflexion']
+                lines_refl = textwrap.wrap(refl_txt, width=38)
+                for line in lines_refl:
+                    bw = draw.textbbox((0,0), line, font=f_refl)
+                    draw.text(((W - (bw[2]-bw[0]))/2, y_cursor), line, font=f_refl, fill="white")
+                    y_cursor += 55
 
-        # Dibujar Referencia en Dorado Suave
-        y_cursor = draw_styled_text(draw1, item['versiculo'], font_ref, (218, 165, 32, 255), y_cursor, 20)
-        y_cursor += 10
-        # Dibujar Texto en Blanco
-        draw_styled_text(draw1, f"\"{item['texto']}\"", font_body, (255, 255, 255, 255), y_cursor, 24)
-
-        img1.save(f"{OUTPUT_DIR}/{item['fecha']}_P1.png")
-
-        # --- PANTALLA 2: REFLEXIÓN (Capa Transparente) ---
-        img2 = Image.new("RGBA", (1024, 1024), (0, 0, 0, 0))
-        draw2 = ImageDraw.Draw(img2)
+            img.save(f"{OUTPUT_DIR}/{item['fecha']}_P{i}.png")
         
-        # Panel de cristal para reflexión
-        draw2.rounded_rectangle([x1-30, y1-30, x2+30, y2+30], radius=40, fill=(0, 0, 0, 160))
-        
-        font_title = ImageFont.truetype(FONT_PATH, 52)
-        font_reflect = ImageFont.truetype(FONT_PATH, 38)
-
-        ref_body_lines = textwrap.wrap(item['reflexion'], width=35)
-        total_h2 = get_text_height(draw2, [item['titulo']], font_title, 20) + get_text_height(draw2, ref_body_lines, font_reflect, 10) + 20
-        y_cursor2 = center_y - (total_h2 / 2)
-
-        # Dibujar Título
-        y_cursor2 = draw_styled_text(draw2, item['titulo'], font_title, (218, 165, 32, 255), y_cursor2, 22)
-        y_cursor2 += 20
-        # Dibujar Reflexión
-        draw_styled_text(draw2, item['reflexion'], font_reflect, (255, 255, 255, 255), y_cursor2, 30)
-
-        img2.save(f"{OUTPUT_DIR}/{item['fecha']}_P2.png")
-        
-        print(f"✨ Generada versión PREMIUM para el {item['fecha']}")
+        print(f"✨ Capas 9:16 generadas para el {item['fecha']}")
 
 if __name__ == "__main__":
     generar_imagenes_premium()
