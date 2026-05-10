@@ -49,25 +49,34 @@ def render_short(fecha):
     is_video = selected_bg.endswith(".mp4")
     print(f"🌍 Fondo seleccionado: {selected_bg}")
         
-    # Crear Outro Transparente Dinámico (Limpieza total)
+    # Crear Outro Transparente Dinámico (Burbuja Premium)
     outro_overlay = os.path.join(IMGS_DIR, f"{fecha}_OUTRO_OVERLAY.png")
     img_outro = Image.new("RGBA", (1080, 1920), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img_outro)
     
-    # Rectángulo de cristal para el cierre
-    draw.rounded_rectangle([150, 700, 930, 1100], radius=50, fill=(0, 0, 0, 180), outline=(218, 165, 32, 100), width=4)
+    try: 
+        font_bubble = ImageFont.truetype(FONT_PATH, 55)
+        font_sub = ImageFont.truetype(FONT_PATH, 45)
+    except: 
+        font_bubble = font_sub = ImageFont.load_default()
     
-    try: font_outro = ImageFont.truetype(FONT_PATH, 60)
-    except: font_outro = ImageFont.load_default()
+    # 1. BURBUJA PREMIUM: "Caminemos Juntos En Fe"
+    txt_bubble = "Caminemos Juntos En Fe"
+    b_bbox = draw.textbbox((0,0), txt_bubble, font=font_bubble)
+    b_w = b_bbox[2] - b_bbox[0]
+    b_h = b_bbox[3] - b_bbox[1]
     
-    txt1 = "SUSCRÍBETE"
-    txt2 = "Para más bendición"
+    # Dibujar la burbuja (encerrada en cristal con borde dorado)
+    padding = 40
+    bx1, by1 = (1080 - b_w)/2 - padding, 800
+    bx2, by2 = (1080 + b_w)/2 + padding, 800 + b_h + padding
+    draw.rounded_rectangle([bx1, by1, bx2, by2], radius=45, fill=(0, 0, 0, 190), outline=(218, 165, 32, 255), width=3)
+    draw.text(((1080-b_w)/2, by1 + padding/2 - 5), txt_bubble, font=font_bubble, fill=(218, 165, 32, 255))
     
-    b1 = draw.textbbox((0,0), txt1, font=font_outro)
-    draw.text(((1080-(b1[2]-b1[0]))/2, 800), txt1, font=font_outro, fill=(218, 165, 32, 255))
-    
-    b2 = draw.textbbox((0,0), txt2, font=font_outro)
-    draw.text(((1080-(b2[2]-b2[0]))/2, 920), txt2, font=font_outro, fill="white")
+    # 2. LLAMADO A LA ACCIÓN (Debajo)
+    txt_cta = "SUSCRÍBETE PARA MÁS BENDICIÓN"
+    c_bbox = draw.textbbox((0,0), txt_cta, font=font_sub)
+    draw.text(((1080-(c_bbox[2]-c_bbox[0]))/2, by2 + 40), txt_cta, font=font_sub, fill="white")
     
     img_outro.save(outro_overlay)
         
