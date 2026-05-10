@@ -35,7 +35,7 @@ jobs:
       run: |
         mkdir -p assets/backgrounds_devocional
         # Descarga de la carpeta compartida de Google Drive
-        gdown --folder "1cjlaW706d7laK9rPP-toB8DfCnTKrXBG" -O assets/backgrounds_devocional/ --remaining-ok
+        gdown --folder "1cjlaW706d7laK9rPP-toB8DfCnTKrXBG" -O assets/backgrounds_devocional/
 
     - name: Install FFmpeg
       run: sudo apt-get update && sudo apt-get install -y ffmpeg
