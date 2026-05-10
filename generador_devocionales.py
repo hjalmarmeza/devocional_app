@@ -36,7 +36,7 @@ def draw_styled_text(draw, text, font, fill, y_start, width_chars):
     for line in lines:
         bbox = draw.textbbox((0, 0), line, font=font)
         w = bbox[2] - bbox[0]
-        draw.text(((1024 - w) / 2, current_y), line, font=font, fill=fill)
+        draw.text(((1080 - w) / 2, current_y), line, font=font, fill=fill)
         current_y += font.size + 12
     return current_y
 
@@ -46,10 +46,18 @@ def generar_imagenes_premium():
 
     import datetime
     today = datetime.date.today().strftime("%Y-%m-%d")
+    
+    # Prioridad: 1. Hoy, 2. El primer pendiente
     hoy_data = [d for d in devocionales if d['fecha'] == today]
+    if not hoy_data:
+        print(f"ℹ️ No se encontró fecha exacta para {today}. Buscando el primer pendiente...")
+        pendientes = [d for d in devocionales if not d.get('publicado', False)]
+        if pendientes:
+            hoy_data = [pendientes[0]]
+            print(f"✅ Procesando pendiente del: {hoy_data[0]['fecha']}")
     
     if not hoy_data:
-        print(f"⚠️ No hay devocional programado para hoy ({today})")
+        print(f"⚠️ No hay devocionales pendientes en el JSON.")
         return
 
     for item in hoy_data:

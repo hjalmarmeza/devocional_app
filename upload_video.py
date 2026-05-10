@@ -82,49 +82,66 @@ def save_status(fecha, video_id):
 
 if __name__ == "__main__":
     today = datetime.date.today().strftime("%Y-%m-%d")
-    path = f"shorts/{today}_short.mp4"
     json_path = "devocionales_2026.json"
     
-    # Cargar datos y verificar si ya se publicó
+    # Valores por defecto
     title_yt = f"Palabra de Vida - {today} #Shorts"
     desc_yt = "🌬️ Recibe esta palabra de bendición hoy. #Shorts #Fe #Dios"
-    already_published = False
+    tags_yt = ["MusiChris Devocional", "Fe", "Dios", "Cristiano"]
     
+    target_item = None
+
     if os.path.exists(json_path):
         from ai_optimizer import get_ai_optimized_metadata
         with open(json_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
+            
+        # 1. Buscar hoy
+        for item in data:
+            if item['fecha'] == today:
+                target_item = item
+                break
+        
+        # 2. Si no hay hoy, buscar primer pendiente
+        if not target_item:
+            print(f"ℹ️ No se encontró devocional para {today}. Buscando primer pendiente...")
             for item in data:
-                if item['fecha'] == today:
-                    if item.get('publicado'):
-                        already_published = True
-                        print(f"✅ El devocional de hoy ({today}) ya consta como publicado.")
-                        break
-                    
-                    # --- OPTIMIZACIÓN POR IA ---
-                    ai_meta = get_ai_optimized_metadata(item['reflexion'], item['versiculo'], item['titulo'])
-                    
-                    if ai_meta:
-                        title_yt = ai_meta.get('titulo', title_yt)
-                        desc_yt = f"🔥 {ai_meta.get('descripcion', desc_yt)}\n\n📖 Versículo: {item['versiculo']}\n\n✨ MusiChris Devocional: Tu dosis diaria de paz.\n\n#Shorts #Dios #Fe #MusiChrisDevocional"
-                        tags_yt = ai_meta.get('tags', ["MusiChris Devocional", "Fe", "Dios", "Cristiano"])
-                    else:
-                        title_yt = f"{item['titulo']} | MusiChris Devocional #Shorts"
-                        desc_yt = f"🔥 {item['titulo']}\n\n{item['reflexion'][:200]}...\n\n📖 Versículo: {item['versiculo']}\n\n✨ MusiChris Devocional: Tu dosis diaria de paz y adoración.\n\n#Shorts #Dios #Fe #Victoria #MusiChrisDevocional #Cristiano"
-                        tags_yt = ["MusiChris Devocional", "Fe", "Dios", "Victoria", "Cristiano", "Palabra de Vida"]
+                if not item.get('publicado', False):
+                    target_item = item
                     break
-
-    if already_published:
+    
+    if not target_item:
+        print("⚠️ No hay devocionales pendientes para procesar.")
         exit(0)
 
-    if os.path.exists(path):
+    # Verificar si ya se publicó (segunda capa de seguridad)
+    if target_item.get('publicado', False):
+        print(f"✅ El devocional de {target_item['fecha']} ya consta como publicado.")
+        exit(0)
+
+    # --- OPTIMIZACIÓN POR IA ---
+    print(f"🧠 Optimizando metadatos por IA para: {target_item['titulo']}...")
+    ai_meta = get_ai_optimized_metadata(target_item['reflexion'], target_item['versiculo'], target_item['titulo'])
+    
+    if ai_meta:
+        title_yt = ai_meta.get('titulo', title_yt)
+        desc_yt = f"🔥 {ai_meta.get('descripcion', desc_yt)}\n\n📖 Versículo: {target_item['versiculo']}\n\n✨ MusiChris Devocional: Tu dosis diaria de paz.\n\n#Shorts #Dios #Fe #MusiChrisDevocional"
+        tags_yt = ai_meta.get('tags', tags_yt)
+    else:
+        title_yt = f"{target_item['titulo']} | MusiChris Devocional #Shorts"
+        desc_yt = f"🔥 {target_item['titulo']}\n\n{target_item['reflexion'][:200]}...\n\n📖 Versículo: {target_item['versiculo']}\n\n✨ MusiChris Devocional: Tu dosis diaria de paz.\n\n#Shorts #Dios #Fe #MusiChrisDevocional"
+
+    # Ruta del video
+    video_path = f"shorts/{target_item['fecha']}_short.mp4"
+
+    if os.path.exists(video_path):
         video_id = upload_to_youtube(
-            video_path=path,
+            video_path=video_path,
             title=title_yt,
             description=desc_yt,
             tags=tags_yt
         )
         if video_id:
-            save_status(today, video_id)
+            save_status(target_item['fecha'], video_id)
     else:
-        print(f"⚠️ Archivo no encontrado: {path}")
+        print(f"❌ Archivo de video no encontrado: {video_path}")

@@ -66,17 +66,19 @@ def render_short(fecha):
     b_w = b_bbox[2] - b_bbox[0]
     b_h = b_bbox[3] - b_bbox[1]
     
-    # Dibujar la burbuja (encerrada en cristal con borde dorado)
-    padding = 40
-    bx1, by1 = (1080 - b_w)/2 - padding, 800
-    bx2, by2 = (1080 + b_w)/2 + padding, 800 + b_h + padding
-    draw.rounded_rectangle([bx1, by1, bx2, by2], radius=45, fill=(0, 0, 0, 190), outline=(218, 165, 32, 255), width=3)
+    # Dibujar la burbuja (Posición más baja para dejar espacio al logo)
+    padding = 50
+    bx1, by1 = (1080 - b_w)/2 - padding, 1100
+    bx2, by2 = (1080 + b_w)/2 + padding, 1100 + b_h + padding
+    
+    # Fondo de cristal oscuro con borde dorado brillante
+    draw.rounded_rectangle([bx1, by1, bx2, by2], radius=50, fill=(0, 0, 0, 210), outline=(218, 165, 32, 255), width=5)
     draw.text(((1080-b_w)/2, by1 + padding/2 - 5), txt_bubble, font=font_bubble, fill=(218, 165, 32, 255))
     
-    # 2. LLAMADO A LA ACCIÓN (Debajo)
+    # 2. LLAMADO A LA ACCIÓN (CTA)
     txt_cta = "SUSCRÍBETE PARA MÁS BENDICIÓN"
     c_bbox = draw.textbbox((0,0), txt_cta, font=font_sub)
-    draw.text(((1080-(c_bbox[2]-c_bbox[0]))/2, by2 + 40), txt_cta, font=font_sub, fill="white")
+    draw.text(((1080-(c_bbox[2]-c_bbox[0]))/2, by2 + 50), txt_cta, font=font_sub, fill="white")
     
     img_outro.save(outro_overlay)
         
@@ -97,12 +99,12 @@ def render_short(fecha):
         f"[0:v]scale=1080*1.5:-1,zoompan=z='zoom+0.0002':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1080x1920:fps=30,setsar=1[bg];"
         f"[1:v]format=rgba,fade=t=in:st=0:d=1:alpha=1,fade=t=out:st=10:d=1:alpha=1[c1];"
         f"[2:v]format=rgba,fade=t=in:st=11:d=1:alpha=1,fade=t=out:st=21:d=1:alpha=1[c2];"
-        f"[3:v]format=rgba,fade=t=in:st=22:d=1:alpha=1,fade=t=out:st=27:d=1:alpha=1[c3];"
-        f"[4:v]colorkey=black:0.1:0.1,scale=600:-1,fade=t=in:st=22:d=1:alpha=1[logo];"
+        f"[3:v]format=rgba,fade=t=in:st=22:d=1:alpha=1[c3];"
+        f"[4:v]colorkey=black:0.1:0.1,scale=700:-1,fade=t=in:st=22:d=1:alpha=1[logo];"
         f"[bg][c1]overlay=0:0[v1];"
         f"[v1][c2]overlay=0:0[v2];"
         f"[v2][c3]overlay=0:0[v3];"
-        f"[v3][logo]overlay=(W-w)/2:350[v]"
+        f"[v3][logo]overlay=(W-w)/2:300[v]"
     )
 
     cmd = ["ffmpeg", "-y"] + input_bg_args + [
@@ -127,8 +129,25 @@ if __name__ == "__main__":
     if os.path.exists(JSON_PATH):
         with open(JSON_PATH, 'r', encoding='utf-8') as f:
             data = json.load(f)
+            
+            # Buscar hoy
+            target = None
             for item in data:
                 if item['fecha'] == today:
-                    render_short(item['fecha'])
+                    target = item
+                    break
+            
+            # Si no hay hoy, buscar primer pendiente
+            if not target:
+                for item in data:
+                    if not item.get('publicado', False):
+                        target = item
+                        print(f"ℹ️ Renderizando primer pendiente: {target['fecha']}")
+                        break
+            
+            if target:
+                render_short(target['fecha'])
+            else:
+                print("⚠️ No hay devocionales pendientes para renderizar.")
     else:
         print(f"❌ No se encontró el archivo JSON: {JSON_PATH}")
