@@ -91,6 +91,7 @@ if __name__ == "__main__":
     already_published = False
     
     if os.path.exists(json_path):
+        from ai_optimizer import get_ai_optimized_metadata
         with open(json_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
             for item in data:
@@ -99,8 +100,18 @@ if __name__ == "__main__":
                         already_published = True
                         print(f"✅ El devocional de hoy ({today}) ya consta como publicado.")
                         break
-                    title_yt = f"{item['titulo']} | MusiChris Devocional #Shorts"
-                    desc_yt = f"🔥 {item['titulo']}\n\n{item['reflexion'][:200]}...\n\n📖 Versículo: {item['versiculo']}\n\n✨ MusiChris Devocional: Tu dosis diaria de paz y adoración.\n\n#Shorts #Dios #Fe #Victoria #MusiChrisDevocional #Cristiano"
+                    
+                    # --- OPTIMIZACIÓN POR IA ---
+                    ai_meta = get_ai_optimized_metadata(item['reflexion'], item['versiculo'], item['titulo'])
+                    
+                    if ai_meta:
+                        title_yt = ai_meta.get('titulo', title_yt)
+                        desc_yt = f"🔥 {ai_meta.get('descripcion', desc_yt)}\n\n📖 Versículo: {item['versiculo']}\n\n✨ MusiChris Devocional: Tu dosis diaria de paz.\n\n#Shorts #Dios #Fe #MusiChrisDevocional"
+                        tags_yt = ai_meta.get('tags', ["MusiChris Devocional", "Fe", "Dios", "Cristiano"])
+                    else:
+                        title_yt = f"{item['titulo']} | MusiChris Devocional #Shorts"
+                        desc_yt = f"🔥 {item['titulo']}\n\n{item['reflexion'][:200]}...\n\n📖 Versículo: {item['versiculo']}\n\n✨ MusiChris Devocional: Tu dosis diaria de paz y adoración.\n\n#Shorts #Dios #Fe #Victoria #MusiChrisDevocional #Cristiano"
+                        tags_yt = ["MusiChris Devocional", "Fe", "Dios", "Victoria", "Cristiano", "Palabra de Vida"]
                     break
 
     if already_published:
@@ -111,7 +122,7 @@ if __name__ == "__main__":
             video_path=path,
             title=title_yt,
             description=desc_yt,
-            tags=["MusiChris Devocional", "Fe", "Dios", "Victoria", "Cristiano", "Palabra de Vida"]
+            tags=tags_yt
         )
         if video_id:
             save_status(today, video_id)

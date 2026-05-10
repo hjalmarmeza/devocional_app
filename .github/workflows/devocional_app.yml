@@ -29,7 +29,13 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install Pillow google-api-python-client google-auth-oauthlib google-auth-httplib2
+        pip install Pillow google-api-python-client google-auth-oauthlib google-auth-httplib2 gdown requests
+
+    - name: Download Spiritual Backgrounds
+      run: |
+        mkdir -p assets/backgrounds_devocional
+        # Descarga de la carpeta compartida de Google Drive
+        gdown --folder "1cjlaW706d7laK9rPP-toB8DfCnTKrXBG" -O assets/backgrounds_devocional/ --remaining-ok
 
     - name: Install FFmpeg
       run: sudo apt-get update && sudo apt-get install -y ffmpeg
@@ -45,6 +51,9 @@ jobs:
         YOUTUBE_CREDENTIALS: ${{ secrets.YOUTUBE_CREDENTIALS }}
         YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
         YOUTUBE_PRIVACY: ${{ github.event.inputs.privacy_status || 'public' }}
+        CEREBRAS_API_KEY: ${{ secrets.CEREBRAS_API_KEY }}
+        DEEPINFRA_API_KEY: ${{ secrets.DEEPINFRA_API_KEY }}
+        DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
       run: python upload_video.py
 
     - name: Commit and Push changes

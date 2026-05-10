@@ -55,25 +55,21 @@ def generar_imagenes_premium():
         return
 
     for item in hoy_data:
-        # ... (resto del código igual)
-        # Determinar el mes para el fondo (formato MM.png)
         mes = item['fecha'].split("-")[1]
-        bg_path = os.path.join(ASSETS_DIR, f"{mes}.png")
         
-        if not os.path.exists(bg_path):
-            bg_path = os.path.join(ASSETS_DIR, DEFAULT_BG)
-            
-        print(f"🎨 Usando fondo: {bg_path} para {item['fecha']}")
-
-        # Obtener calibración para el mes
+        # Obtener calibración para el mes (mantener consistencia visual)
         x1, y1, x2, y2 = CALIBRACION.get(mes, CALIBRACION["default"])
         rect_width = x2 - x1
         rect_height = y2 - y1
         center_y = y1 + (rect_height / 2)
 
-        # --- PANTALLA 1: VERSÍCULO ---
-        img1 = Image.open(bg_path).convert("RGBA")
+        # --- PANTALLA 1: VERSÍCULO (Capa Transparente) ---
+        img1 = Image.new("RGBA", (1024, 1024), (0, 0, 0, 0)) # Formato cuadrado para el centro
         draw1 = ImageDraw.Draw(img1)
+        
+        # Dibujar un panel de cristal oscuro semi-transparente
+        # x1, y1, x2, y2 ya están definidos por la calibración
+        draw1.rounded_rectangle([x1-20, y1-20, x2+20, y2+20], radius=40, fill=(0, 0, 0, 160))
         
         font_ref = ImageFont.truetype(FONT_PATH, 55)
         font_body = ImageFont.truetype(FONT_PATH, 44)
@@ -85,16 +81,19 @@ def generar_imagenes_premium():
         y_cursor = center_y - (total_h / 2)
 
         # Dibujar Referencia en Dorado Suave
-        y_cursor = draw_styled_text(draw1, item['versiculo'], font_ref, (218, 165, 32), y_cursor, 20)
+        y_cursor = draw_styled_text(draw1, item['versiculo'], font_ref, (218, 165, 32, 255), y_cursor, 20)
         y_cursor += 10
         # Dibujar Texto en Blanco
-        draw_styled_text(draw1, f"\"{item['texto']}\"", font_body, (255, 255, 255), y_cursor, 24)
+        draw_styled_text(draw1, f"\"{item['texto']}\"", font_body, (255, 255, 255, 255), y_cursor, 24)
 
         img1.save(f"{OUTPUT_DIR}/{item['fecha']}_P1.png")
 
-        # --- PANTALLA 2: REFLEXIÓN ---
-        img2 = Image.open(bg_path).convert("RGBA")
+        # --- PANTALLA 2: REFLEXIÓN (Capa Transparente) ---
+        img2 = Image.new("RGBA", (1024, 1024), (0, 0, 0, 0))
         draw2 = ImageDraw.Draw(img2)
+        
+        # Panel de cristal para reflexión
+        draw2.rounded_rectangle([x1-30, y1-30, x2+30, y2+30], radius=40, fill=(0, 0, 0, 160))
         
         font_title = ImageFont.truetype(FONT_PATH, 52)
         font_reflect = ImageFont.truetype(FONT_PATH, 38)
@@ -104,10 +103,10 @@ def generar_imagenes_premium():
         y_cursor2 = center_y - (total_h2 / 2)
 
         # Dibujar Título
-        y_cursor2 = draw_styled_text(draw2, item['titulo'], font_title, (218, 165, 32), y_cursor2, 22)
+        y_cursor2 = draw_styled_text(draw2, item['titulo'], font_title, (218, 165, 32, 255), y_cursor2, 22)
         y_cursor2 += 20
         # Dibujar Reflexión
-        draw_styled_text(draw2, item['reflexion'], font_reflect, (255, 255, 255), y_cursor2, 30)
+        draw_styled_text(draw2, item['reflexion'], font_reflect, (255, 255, 255, 255), y_cursor2, 30)
 
         img2.save(f"{OUTPUT_DIR}/{item['fecha']}_P2.png")
         
