@@ -78,8 +78,8 @@ def render_short(fecha):
     
     # Dibujar la burbuja (Posición más baja para dejar espacio al logo)
     padding = 50
-    bx1, by1 = (1080 - b_w)/2 - padding, 1100
-    bx2, by2 = (1080 + b_w)/2 + padding, 1100 + b_h + padding
+    bx1, by1 = (1080 - b_w)/2 - padding, 1350
+    bx2, by2 = (1080 + b_w)/2 + padding, 1350 + b_h + padding
     
     # Fondo de cristal oscuro con borde dorado brillante
     draw.rounded_rectangle([bx1, by1, bx2, by2], radius=50, fill=(0, 0, 0, 210), outline=(218, 165, 32, 255), width=5)
