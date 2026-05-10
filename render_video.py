@@ -120,9 +120,9 @@ def render_short(fecha):
     )
 
     cmd = ["ffmpeg", "-y"] + input_bg_args + [
-        "-i", p1, 
-        "-i", p2, 
-        "-i", outro_overlay, 
+        "-loop", "1", "-i", p1, 
+        "-loop", "1", "-i", p2, 
+        "-loop", "1", "-i", outro_overlay, 
         "-stream_loop", "-1", "-i", logo_animado, 
         "-i", music, 
         "-filter_complex", filter_complex, 
@@ -132,6 +132,7 @@ def render_short(fecha):
         output_video
     ]
     
+    print(f"🎬 [DIAGNÓSTICO FFmpeg]: {' '.join(cmd)}")
     subprocess.run(cmd)
     print(f"🎬 Short finalizado con éxito: {output_video}")
 
