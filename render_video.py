@@ -45,7 +45,8 @@ def render_short(fecha):
                 if file.endswith(".mp4"):
                     potential_bgs.append(os.path.join(root, file))
     
-    selected_bg = potential_bgs[0] if potential_bgs else fallback_bg
+    import random
+    selected_bg = random.choice(potential_bgs) if potential_bgs else fallback_bg
     is_video = selected_bg.endswith(".mp4")
     print(f"🌍 Fondo seleccionado: {selected_bg}")
         
