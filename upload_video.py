@@ -95,6 +95,7 @@ if __name__ == "__main__":
         from ai_optimizer import get_ai_optimized_metadata
         with open(json_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
+            print(f"📦 [SISTEMA] Motor de Subida: {len(data)} devocionales detectados en base de datos.")
             
         # 1. Buscar hoy
         for item in data:

@@ -43,6 +43,7 @@ def draw_styled_text(draw, text, font, fill, y_start, width_chars):
 def generar_imagenes_premium():
     with open(JSON_PATH, 'r', encoding='utf-8') as f:
         devocionales = json.load(f)
+        print(f"📦 [SISTEMA] Base de datos JSON cargada: {len(devocionales)} devocionales detectados.")
 
     import datetime
     today = datetime.date.today().strftime("%Y-%m-%d")

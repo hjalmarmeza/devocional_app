@@ -141,6 +141,7 @@ if __name__ == "__main__":
     if os.path.exists(JSON_PATH):
         with open(JSON_PATH, 'r', encoding='utf-8') as f:
             data = json.load(f)
+            print(f"📦 [SISTEMA] Motor de Renderizado: {len(data)} fechas cargadas correctamente.")
             
             # Buscar hoy
             target = None
