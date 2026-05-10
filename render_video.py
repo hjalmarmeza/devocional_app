@@ -116,7 +116,7 @@ def render_short(fecha):
         f"[1:v]format=rgba,fade=t=in:st=0:d=1:alpha=1,fade=t=out:st=10:d=1:alpha=1[c1];"
         f"[2:v]format=rgba,fade=t=in:st=11:d=1:alpha=1,fade=t=out:st=21:d=1:alpha=1[c2];"
         f"[3:v]format=rgba,fade=t=in:st=22:d=1:alpha=1[c3];"
-        f"[4:v]colorkey=black:0.1:0.1,scale=900:-1,fade=t=in:st=22:d=1:alpha=1[logo];"
+        f"[4:v]crop=800:800:(iw-800)/2:(ih-800)/2,colorkey=black:0.1:0.1,scale=950:-1,fade=t=in:st=22:d=1:alpha=1[logo];"
         f"[bg][c1]overlay=0:0:enable='between(t,0,11)'[v1];"
         f"[v1][c2]overlay=0:0:enable='between(t,11,22)'[v2];"
         f"[v2][c3]overlay=0:0:enable='gt(t,22)'[v3];"
