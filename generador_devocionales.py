@@ -60,6 +60,14 @@ def generar_imagenes_premium():
     if not hoy_data:
         print(f"⚠️ No hay devocionales pendientes en el JSON.")
         return
+    import urllib.request
+    os.makedirs("assets/fonts", exist_ok=True)
+    font_main = "assets/fonts/Montserrat-Bold.ttf"
+    font_text = "assets/fonts/Montserrat-Medium.ttf"
+    if not os.path.exists(font_main):
+        urllib.request.urlretrieve("https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Bold.ttf", font_main)
+    if not os.path.exists(font_text):
+        urllib.request.urlretrieve("https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Medium.ttf", font_text)
 
     for item in hoy_data:
         # --- CONFIGURACIÓN DE LIENZO VERTICAL (1080x1920) ---
@@ -71,16 +79,11 @@ def generar_imagenes_premium():
             
             # 1. DIBUJAR TÍTULO EN 2 LÍNEAS (Parte Superior)
             try:
-                font_title_main = ImageFont.truetype(FONT_PATH, 100)
-                font_title_sub = ImageFont.truetype(FONT_PATH, 80)
+                font_title_main = ImageFont.truetype(font_main, 100)
+                font_title_sub = ImageFont.truetype(font_main, 80)
             except Exception as e:
-                print(f"⚠️ Fuente no encontrada en generador: {e}. Usando fuentes de emergencia.")
-                try:
-                    font_title_main = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 100)
-                    font_title_sub = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 80)
-                except:
-                    font_title_main = ImageFont.load_default(size=80)
-                    font_title_sub = ImageFont.load_default(size=60)
+                font_title_main = ImageFont.load_default(size=80)
+                font_title_sub = ImageFont.load_default(size=60)
             
             # "DEVOCIONAL"
             t1 = "DEVOCIONAL"
@@ -100,53 +103,65 @@ def generar_imagenes_premium():
             # 3. CONTENIDO DINÁMICO
             if i == 1: # P1: Versículo
                 try:
-                    f_ref = ImageFont.truetype(FONT_PATH, 65)
-                    f_text = ImageFont.truetype(FONT_PATH, 50)
+                    f_ref = ImageFont.truetype(font_main, 75)
+                    f_text = ImageFont.truetype(font_text, 55)
                 except:
                     f_ref = ImageFont.load_default(size=50)
                     f_text = ImageFont.load_default(size=40)
                 
-                # Referencia
                 ref_txt = item['versiculo']
                 print(f"📝 Generando P1 para {item['fecha']}: {ref_txt}")
-                lines_ref = textwrap.wrap(ref_txt, width=25)
-                y_cursor = m_y1 + 80
+                lines_ref = textwrap.wrap(ref_txt, width=22)
+                body_txt = f"\"{item['texto']}\""
+                lines_body = textwrap.wrap(body_txt, width=30)
+                
+                h_ref = len(lines_ref) * 85
+                h_body = len(lines_body) * 70
+                total_h = h_ref + 50 + h_body
+                
+                y_cursor = m_y1 + ((m_y2 - m_y1) - total_h) / 2
+                
                 for line in lines_ref:
                     bw = draw.textbbox((0,0), line, font=f_ref)
                     draw.text(((W - (bw[2]-bw[0]))/2, y_cursor), line, font=f_ref, fill=(218, 165, 32, 255))
-                    y_cursor += 80
+                    y_cursor += 85
                 
-                y_cursor += 40
-                # Texto del versículo
-                body_txt = f"\"{item['texto']}\""
-                lines_body = textwrap.wrap(body_txt, width=30)
+                y_cursor += 50
                 for line in lines_body:
                     bw = draw.textbbox((0,0), line, font=f_text)
                     draw.text(((W - (bw[2]-bw[0]))/2, y_cursor), line, font=f_text, fill="white")
-                    y_cursor += 65
+                    y_cursor += 70
                     
             else: # P2: Reflexión
                 try:
-                    f_title = ImageFont.truetype(FONT_PATH, 70)
-                    f_refl = ImageFont.truetype(FONT_PATH, 45)
+                    f_title = ImageFont.truetype(font_main, 75)
+                    f_refl = ImageFont.truetype(font_text, 45)
                 except:
                     f_title = ImageFont.load_default(size=55)
                     f_refl = ImageFont.load_default(size=35)
                 
-                # Título de la reflexión
                 refl_title = item['titulo']
                 print(f"📖 Generando P2 para {item['fecha']}: {refl_title}")
-                bw = draw.textbbox((0,0), refl_title, font=f_title)
-                draw.text(((W - (bw[2]-bw[0]))/2, m_y1 + 80), refl_title, font=f_title, fill=(218, 165, 32, 255))
-                
-                # Cuerpo de la reflexión
-                y_cursor = m_y1 + 200
                 refl_txt = item['reflexion']
                 lines_refl = textwrap.wrap(refl_txt, width=38)
+                lines_title = textwrap.wrap(refl_title, width=22)
+                
+                h_title = len(lines_title) * 90
+                h_body = len(lines_refl) * 60
+                total_h = h_title + 60 + h_body
+                
+                y_cursor = m_y1 + ((m_y2 - m_y1) - total_h) / 2
+                
+                for line in lines_title:
+                    bw = draw.textbbox((0,0), line, font=f_title)
+                    draw.text(((W - (bw[2]-bw[0]))/2, y_cursor), line, font=f_title, fill=(218, 165, 32, 255))
+                    y_cursor += 90
+                    
+                y_cursor += 60
                 for line in lines_refl:
                     bw = draw.textbbox((0,0), line, font=f_refl)
                     draw.text(((W - (bw[2]-bw[0]))/2, y_cursor), line, font=f_refl, fill="white")
-                    y_cursor += 55
+                    y_cursor += 60
 
             img.save(f"{OUTPUT_DIR}/{item['fecha']}_P{i}.png")
         

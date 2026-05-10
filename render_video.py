@@ -54,18 +54,22 @@ def render_short(fecha):
     img_outro = Image.new("RGBA", (1080, 1920), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img_outro)
     
-    try: 
-        font_bubble = ImageFont.truetype(FONT_PATH, 55)
-        font_sub = ImageFont.truetype(FONT_PATH, 45)
+    import urllib.request
+    os.makedirs("assets/fonts", exist_ok=True)
+    font_main = "assets/fonts/Montserrat-Bold.ttf"
+    font_text = "assets/fonts/Montserrat-Medium.ttf"
+    try:
+        if not os.path.exists(font_main):
+            urllib.request.urlretrieve("https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Bold.ttf", font_main)
+        if not os.path.exists(font_text):
+            urllib.request.urlretrieve("https://raw.githubusercontent.com/JulietaUla/Montserrat/master/fonts/ttf/Montserrat-Medium.ttf", font_text)
+            
+        font_bubble = ImageFont.truetype(font_main, 55)
+        font_sub = ImageFont.truetype(font_text, 45)
     except Exception as e: 
-        print(f"⚠️ Error cargando fuente: {e}. Usando fuente de emergencia.")
-        # Intentar cargar una fuente de sistema en Linux (GitHub Actions)
-        try:
-            font_bubble = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 55)
-            font_sub = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 45)
-        except:
-            font_bubble = font_sub = ImageFont.load_default(size=50) # Tamaño grande para emergencia
-    
+        print(f"⚠️ Error cargando fuente Premium: {e}. Usando fuente de emergencia.")
+        font_bubble = font_sub = ImageFont.load_default(size=50)
+
     # 1. BURBUJA PREMIUM: "Caminemos Juntos En Fe"
     txt_bubble = "Caminemos Juntos En Fe"
     b_bbox = draw.textbbox((0,0), txt_bubble, font=font_bubble)
@@ -112,7 +116,7 @@ def render_short(fecha):
         f"[1:v]format=rgba,fade=t=in:st=0:d=1:alpha=1,fade=t=out:st=10:d=1:alpha=1[c1];"
         f"[2:v]format=rgba,fade=t=in:st=11:d=1:alpha=1,fade=t=out:st=21:d=1:alpha=1[c2];"
         f"[3:v]format=rgba,fade=t=in:st=22:d=1:alpha=1[c3];"
-        f"[4:v]colorkey=black:0.1:0.1,scale=700:-1,crop=iw:ih-50:0:0,fade=t=in:st=22:d=1:alpha=1[logo];"
+        f"[4:v]colorkey=black:0.1:0.1,scale=700:-1,fade=t=in:st=22:d=1:alpha=1[logo];"
         f"[bg][c1]overlay=0:0:enable='between(t,0,11)'[v1];"
         f"[v1][c2]overlay=0:0:enable='between(t,11,22)'[v2];"
         f"[v2][c3]overlay=0:0:enable='gt(t,22)'[v3];"
