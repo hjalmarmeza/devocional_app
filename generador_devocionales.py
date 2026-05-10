@@ -72,8 +72,14 @@ def generar_imagenes_premium():
             try:
                 font_title_main = ImageFont.truetype(FONT_PATH, 100)
                 font_title_sub = ImageFont.truetype(FONT_PATH, 80)
-            except:
-                font_title_main = font_title_sub = ImageFont.load_default()
+            except Exception as e:
+                print(f"⚠️ Fuente no encontrada en generador: {e}. Usando fuentes de emergencia.")
+                try:
+                    font_title_main = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 100)
+                    font_title_sub = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 80)
+                except:
+                    font_title_main = ImageFont.load_default(size=80)
+                    font_title_sub = ImageFont.load_default(size=60)
             
             # "DEVOCIONAL"
             t1 = "DEVOCIONAL"
@@ -86,19 +92,22 @@ def generar_imagenes_premium():
             draw.text(((W - (bbox2[2]-bbox2[0]))/2, 260), t2, font=font_title_sub, fill=(218, 165, 32, 255), stroke_width=1, stroke_fill="black")
 
             # 2. MARCO DE CRISTAL CENTRAL
-            # Definimos un marco elegante en el centro
             m_x1, m_y1, m_x2, m_y2 = 100, 500, 980, 1400
-            draw.rounded_rectangle([m_x1, m_y1, m_x2, m_y2], radius=50, fill=(0, 0, 0, 160), outline=(255, 255, 255, 50), width=3)
+            # Aumentamos la opacidad para asegurar visibilidad
+            draw.rounded_rectangle([m_x1, m_y1, m_x2, m_y2], radius=50, fill=(0, 0, 0, 200), outline=(255, 255, 255, 80), width=4)
             
             # 3. CONTENIDO DINÁMICO
-            center_panel_y = (m_y1 + m_y2) / 2
-            
             if i == 1: # P1: Versículo
-                f_ref = ImageFont.truetype(FONT_PATH, 65)
-                f_text = ImageFont.truetype(FONT_PATH, 50)
+                try:
+                    f_ref = ImageFont.truetype(FONT_PATH, 65)
+                    f_text = ImageFont.truetype(FONT_PATH, 50)
+                except:
+                    f_ref = ImageFont.load_default(size=50)
+                    f_text = ImageFont.load_default(size=40)
                 
                 # Referencia
                 ref_txt = item['versiculo']
+                print(f"📝 Generando P1 para {item['fecha']}: {ref_txt}")
                 lines_ref = textwrap.wrap(ref_txt, width=25)
                 y_cursor = m_y1 + 80
                 for line in lines_ref:
@@ -116,11 +125,16 @@ def generar_imagenes_premium():
                     y_cursor += 65
                     
             else: # P2: Reflexión
-                f_title = ImageFont.truetype(FONT_PATH, 70)
-                f_refl = ImageFont.truetype(FONT_PATH, 45)
+                try:
+                    f_title = ImageFont.truetype(FONT_PATH, 70)
+                    f_refl = ImageFont.truetype(FONT_PATH, 45)
+                except:
+                    f_title = ImageFont.load_default(size=55)
+                    f_refl = ImageFont.load_default(size=35)
                 
                 # Título de la reflexión
                 refl_title = item['titulo']
+                print(f"📖 Generando P2 para {item['fecha']}: {refl_title}")
                 bw = draw.textbbox((0,0), refl_title, font=f_title)
                 draw.text(((W - (bw[2]-bw[0]))/2, m_y1 + 80), refl_title, font=f_title, fill=(218, 165, 32, 255))
                 

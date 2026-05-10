@@ -57,8 +57,14 @@ def render_short(fecha):
     try: 
         font_bubble = ImageFont.truetype(FONT_PATH, 55)
         font_sub = ImageFont.truetype(FONT_PATH, 45)
-    except: 
-        font_bubble = font_sub = ImageFont.load_default()
+    except Exception as e: 
+        print(f"⚠️ Error cargando fuente: {e}. Usando fuente de emergencia.")
+        # Intentar cargar una fuente de sistema en Linux (GitHub Actions)
+        try:
+            font_bubble = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 55)
+            font_sub = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 45)
+        except:
+            font_bubble = font_sub = ImageFont.load_default(size=50) # Tamaño grande para emergencia
     
     # 1. BURBUJA PREMIUM: "Caminemos Juntos En Fe"
     txt_bubble = "Caminemos Juntos En Fe"
@@ -95,16 +101,22 @@ def render_short(fecha):
     input_bg_args = ["-stream_loop", "-1", "-i", selected_bg] if is_video else ["-loop", "1", "-i", selected_bg]
     
     # Filtro Cinematográfico Pro (Capas nativas 1080x1920)
+    # 1. Procesamos el fondo (si es video no usamos zoompan complejo para evitar bugs)
+    if is_video:
+        bg_filter = f"[0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1[bg];"
+    else:
+        bg_filter = f"[0:v]scale=1080*1.5:-1,zoompan=z='zoom+0.0005':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=900:s=1080x1920:fps=30,setsar=1[bg];"
+
     filter_complex = (
-        f"[0:v]scale=1080*1.5:-1,zoompan=z='zoom+0.0002':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1080x1920:fps=30,setsar=1[bg];"
+        f"{bg_filter}"
         f"[1:v]format=rgba,fade=t=in:st=0:d=1:alpha=1,fade=t=out:st=10:d=1:alpha=1[c1];"
         f"[2:v]format=rgba,fade=t=in:st=11:d=1:alpha=1,fade=t=out:st=21:d=1:alpha=1[c2];"
         f"[3:v]format=rgba,fade=t=in:st=22:d=1:alpha=1[c3];"
-        f"[4:v]colorkey=black:0.1:0.1,scale=700:-1,fade=t=in:st=22:d=1:alpha=1[logo];"
-        f"[bg][c1]overlay=0:0[v1];"
-        f"[v1][c2]overlay=0:0[v2];"
-        f"[v2][c3]overlay=0:0[v3];"
-        f"[v3][logo]overlay=(W-w)/2:300[v]"
+        f"[4:v]colorkey=black:0.1:0.1,scale=700:-1,crop=iw:ih-50:0:0,fade=t=in:st=22:d=1:alpha=1[logo];"
+        f"[bg][c1]overlay=0:0:enable='between(t,0,11)'[v1];"
+        f"[v1][c2]overlay=0:0:enable='between(t,11,22)'[v2];"
+        f"[v2][c3]overlay=0:0:enable='gt(t,22)'[v3];"
+        f"[v3][logo]overlay=(W-w)/2:300:enable='gt(t,22)'[v]"
     )
 
     cmd = ["ffmpeg", "-y"] + input_bg_args + [
