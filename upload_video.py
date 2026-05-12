@@ -4,6 +4,34 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google.oauth2.credentials import Credentials
 import json
+import base64
+
+def safe_load_json(value, name):
+    """Carga un JSON manejando Base64 y limpiando basura de copiado (espacios, markdown)."""
+    if not value:
+        return None
+    
+    # 1. Limpieza extrema de basura de copiado/pegado
+    value = value.strip()
+    if value.startswith("```json"):
+        value = value[7:]
+    if value.startswith("```"):
+        value = value[3:]
+    if value.endswith("```"):
+        value = value[:-3]
+    value = value.strip()
+
+    try:
+        # Intento 1: JSON Directo
+        return json.loads(value)
+    except json.JSONDecodeError:
+        try:
+            # Intento 2: Base64
+            decoded = base64.b64decode(value).decode('utf-8')
+            return json.loads(decoded)
+        except Exception:
+            sample = value[:15] + "..." if len(value) > 15 else value
+            raise ValueError(f"Error: El secreto {name} no es un JSON válido. Revisa que no tenga texto extra. Empieza con: {sample}")
 
 def upload_to_youtube(video_path, title, description, tags):
     print(f"🚀 Iniciando motor de subida ministerial para: {video_path}")
@@ -16,21 +44,28 @@ def upload_to_youtube(video_path, title, description, tags):
         print("❌ Faltan secretos de YouTube")
         return
 
-    creds_data = json.loads(creds_json)
-    token_data = json.loads(token_json)
-    
-    # Extraer client_id y client_secret de las credenciales
-    client_info = creds_data.get('installed') or creds_data.get('web') or creds_data
-    
-    # Asegurar que el token tenga lo necesario
-    if 'client_id' not in token_data:
-        token_data['client_id'] = client_info.get('client_id')
-    if 'client_secret' not in token_data:
-        token_data['client_secret'] = client_info.get('client_secret')
-    if 'token_uri' not in token_data:
-        token_data['token_uri'] = "https://oauth2.googleapis.com/token"
+    try:
+        creds_data = safe_load_json(creds_json, "YOUTUBE_CREDENTIALS")
+        token_data = safe_load_json(token_json, "YOUTUBE_TOKEN")
+        
+        # Extraer client_id y client_secret de las credenciales
+        client_info = creds_data.get('installed') or creds_data.get('web') or creds_data
+        
+        # Asegurar que el token tenga lo necesario para auto-refresh
+        if 'client_id' not in token_data:
+            token_data['client_id'] = client_info.get('client_id')
+        if 'client_secret' not in token_data:
+            token_data['client_secret'] = client_info.get('client_secret')
+        if 'token_uri' not in token_data:
+            token_data['token_uri'] = "https://oauth2.googleapis.com/token"
 
-    credentials = Credentials.from_authorized_user_info(token_data)
+        credentials = Credentials.from_authorized_user_info(token_data)
+    except ValueError as e:
+        print(f"❌ {e}")
+        return
+    except Exception as e:
+        print(f"❌ Error configurando credenciales: {e}")
+        return
     youtube = build('youtube', 'v3', credentials=credentials)
 
     body = {
